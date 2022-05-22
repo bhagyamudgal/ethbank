@@ -1,0 +1,60 @@
+.stakingForm {
+	padding: 2rem;
+	display: flex;
+	justify-content: center;
+}
+
+.stakingForm-form {
+	background-color: #2d4263;
+	border-radius: 10px;
+	color: #ecdbba;
+	padding: 2rem;
+	display: flex;
+	flex-direction: column;
+}
+.stakingForm-form-section {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	margin: 0.5rem 0;
+}
+
+.stakingForm-form-section label {
+	margin-right: 1rem;
+}
+
+.stakingForm-form-section input {
+	padding: 0.5rem;
+}
+
+.stakingForm-form-section button {
+	padding: 0.5rem;
+	width: 100%;
+	cursor: pointer;
+	background-color: #c84a31;
+	border: none;
+	color: white;
+}
+
+.stakingForm-form-section button:hover {
+	background-color: #e34f31;
+}
+
+.stakingForm-form-section button:disabled {
+	background-color: grey;
+	cursor: not-allowed;
+}
+
+@media only screen and (max-width: 440px) {
+	.stakingForm-form {
+		justify-content: center;
+	}
+
+	.stakingForm-form label {
+		margin-bottom: 1rem;
+	}
+
+	.stakingForm-form input {
+		width: 100%;
+	}
+}
