@@ -4,6 +4,14 @@ import "./DisplayBalance.css";
 import { convertFromWei } from "../utils/web3";
 
 function DisplayBalance({ stakingBalance, rewardsBalance }) {
+	const convertedStakingBalance = Number(
+		convertFromWei(stakingBalance)
+	).toFixed(2);
+
+	const convertedRewardsBalance = Number(
+		convertFromWei(rewardsBalance)
+	).toFixed(2);
+
 	return (
 		<div className="displayBalance">
 			<div className="displayBalance-section">
@@ -11,7 +19,7 @@ function DisplayBalance({ stakingBalance, rewardsBalance }) {
 					Staking Balance
 				</span>
 				<span className="displayBalance-section-value">
-					{convertFromWei(stakingBalance)} USDT
+					{convertedStakingBalance} mUSDT
 				</span>
 			</div>
 			<div className="displayBalance-section">
@@ -19,7 +27,7 @@ function DisplayBalance({ stakingBalance, rewardsBalance }) {
 					Rewards Balance
 				</span>
 				<span className="displayBalance-section-value">
-					{convertFromWei(rewardsBalance)} ERT
+					{convertedRewardsBalance} ERT
 				</span>
 			</div>
 		</div>

@@ -7,9 +7,12 @@
 	font-family: "Ubuntu", sans-serif;
 }
 
+body {
+	background-color: #191919;
+}
+
 .app {
 	min-height: 100vh;
-	background-color: #191919;
 }
 
 .app-bank {

@@ -20,7 +20,7 @@ contract("ethbank", ([owner, investor]) => {
 		ethbank = await Ethbank.new(ert.address, tether.address);
 
 		await ert.transfer(ethbank.address, tokens("1000000"));
-		await tether.transfer(investor, tokens("500"), {
+		await tether.transfer(investor, tokens("400"), {
 			from: owner,
 		});
 	});
@@ -48,6 +48,30 @@ contract("ethbank", ([owner, investor]) => {
 		it("contract has tokens", async () => {
 			const balance = await ert.balanceOf(ethbank.address);
 			assert.equal(balance, tokens("1000000"));
+		});
+	});
+
+	describe("Airdrop", async () => {
+		it("matches name successfully", async () => {
+			let result;
+
+			result = await tether.balanceOf(investor);
+			assert.equal(
+				result.toString(),
+				tokens("400"),
+				"investor mock tether balance before airdrop"
+			);
+
+			await tether.airdrop({
+				from: investor,
+			});
+
+			result = await tether.balanceOf(investor);
+			assert.equal(
+				result.toString(),
+				tokens("500"),
+				"investor mock tether balance after airdrop"
+			);
 		});
 	});
 

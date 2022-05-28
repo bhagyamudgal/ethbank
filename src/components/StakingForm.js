@@ -3,16 +3,46 @@ import "./StakingForm.css";
 
 import { convertFromWei, convertToWei } from "../utils/web3";
 
+const ownerAddress = process.env.REACT_APP_OWNER_PUBLIC_ADDRESS;
+
 function StakingForm({
 	accountBalance,
 	contractData,
 	accountAddress,
 	setReloadData,
 	setError,
+	setSuccess,
 }) {
-	const [stakingAmountValue, setStakingAmountValue] = useState(null);
+	const accountBalanceInTether = Number(
+		convertFromWei(accountBalance)
+	).toFixed(2);
+
+	const [stakingAmountValue, setStakingAmountValue] = useState("");
 	const [isBtnDisabled, setIsBtnDisabled] = useState(true);
-	const [loading, setLoading] = useState({ deposit: false, withdraw: false });
+	const [loading, setLoading] = useState({
+		deposit: false,
+		withdraw: false,
+		airdrop: false,
+	});
+
+	const renderIssueRewardsButton = () => {
+		if (ownerAddress === accountAddress) {
+			return (
+				<div className="stakingForm-form-section">
+					<button
+						type="button"
+						disabled={loading.issueRewards}
+						onClick={issueRewardsHandler}
+					>
+						{loading.issueRewards
+							? "Sending rewards..."
+							: "ISSUE REWARDS"}
+					</button>
+				</div>
+			);
+		}
+		return null;
+	};
 
 	const stakingAmountValueHandler = (event) => {
 		const valueInString = event.target.value;
@@ -28,6 +58,7 @@ function StakingForm({
 		setStakingAmountValue(valueInString);
 	};
 
+	// function to stake/deposit tokens
 	const depositHandler = async () => {
 		try {
 			setLoading((prevState) => {
@@ -45,16 +76,20 @@ function StakingForm({
 
 			await ethbank.methods
 				.depositTokens(convertToWei(stakingAmountValue))
-				.send({ from: accountAddress })
-				.on("transactionHash", (hash) => {
-					setLoading((prevState) => {
-						return { ...prevState, deposit: false };
-					});
+				.send({ from: accountAddress });
 
-					setReloadData(true);
+			setLoading((prevState) => {
+				return { ...prevState, deposit: false };
+			});
 
-					setStakingAmountValue(null);
-				});
+			setStakingAmountValue("");
+
+			setSuccess({
+				status: true,
+				message: "mUSDT Tokens staked successfully!",
+			});
+
+			setReloadData((prevState) => prevState + 1);
 		} catch (error) {
 			console.log("depositHandler => ", { error });
 			setLoading((prevState) => {
@@ -67,6 +102,7 @@ function StakingForm({
 		}
 	};
 
+	// function to un-stake/withdraw tokens
 	const withdrawHandler = async () => {
 		try {
 			setLoading((prevState) => {
@@ -77,16 +113,18 @@ function StakingForm({
 
 			await ethbank.methods
 				.unstakeTokens()
-				.send({ from: accountAddress })
-				.on("transactionHash", (hash) => {
-					setLoading((prevState) => {
-						return { ...prevState, withdraw: false };
-					});
+				.send({ from: accountAddress });
 
-					setReloadData(true);
+			setLoading((prevState) => {
+				return { ...prevState, withdraw: false };
+			});
 
-					setStakingAmountValue(null);
-				});
+			setSuccess({
+				status: true,
+				message: "mUSDT Tokens withdrawn successfully!",
+			});
+
+			setReloadData((prevState) => prevState + 1);
 		} catch (error) {
 			console.log("withdrawHandler => ", { error });
 			setLoading((prevState) => {
@@ -99,7 +137,71 @@ function StakingForm({
 		}
 	};
 
-	const airdropHandler = () => {};
+	const airdropHandler = async () => {
+		try {
+			setLoading((prevState) => {
+				return { ...prevState, airdrop: true };
+			});
+
+			const tether = contractData.tether;
+
+			await tether.methods.airdrop().send({ from: accountAddress });
+
+			setLoading((prevState) => {
+				return { ...prevState, airdrop: false };
+			});
+
+			setSuccess({
+				status: true,
+				message:
+					"mUSDT Tokens got transferred to your address successfully!",
+			});
+
+			setReloadData((prevState) => prevState + 1);
+		} catch (error) {
+			console.log("airdropHandler => ", { error });
+			setLoading((prevState) => {
+				return { ...prevState, airdrop: false };
+			});
+			setError({
+				status: true,
+				message: "Error while getting airdrop! Please try again.",
+			});
+		}
+	};
+
+	const issueRewardsHandler = async () => {
+		try {
+			setLoading((prevState) => {
+				return { ...prevState, issueRewards: true };
+			});
+
+			const ethbank = contractData.ethbank;
+
+			await ethbank.methods.issueRewards().send({ from: accountAddress });
+
+			setLoading((prevState) => {
+				return { ...prevState, issueRewards: false };
+			});
+
+			setSuccess({
+				status: true,
+				message:
+					"ERT Tokens distributed to all the stakers successfully!",
+			});
+
+			setReloadData((prevState) => prevState + 1);
+		} catch (error) {
+			console.log("issueRewardsHandler => ", { error });
+			setLoading((prevState) => {
+				return { ...prevState, issueRewards: false };
+			});
+			setError({
+				status: true,
+				message: "Error while issuing rewards! Please try again.",
+			});
+		}
+	};
 
 	return (
 		<div className="stakingForm">
@@ -110,7 +212,7 @@ function StakingForm({
 				className="stakingForm-form"
 			>
 				<div className="stakingForm-form-section">
-					<p>Balance: {convertFromWei(accountBalance)} USDT</p>
+					<p>Balance: {accountBalanceInTether} mUSDT</p>
 				</div>
 				<div
 					className="stakingForm-form-section"
@@ -122,6 +224,7 @@ function StakingForm({
 						placeholder="Enter Amount"
 						min={0}
 						onChange={stakingAmountValueHandler}
+						value={stakingAmountValue}
 					/>
 				</div>
 
@@ -138,7 +241,7 @@ function StakingForm({
 				<div className="stakingForm-form-section">
 					<button
 						type="button"
-						disabled={isBtnDisabled || loading.withdraw}
+						disabled={loading.withdraw}
 						onClick={withdrawHandler}
 					>
 						{loading.withdraw ? "Withdrawing..." : "WITHDRAW"}
@@ -146,10 +249,18 @@ function StakingForm({
 				</div>
 
 				<div className="stakingForm-form-section">
-					<button type="button" onClick={airdropHandler}>
-						AIRDROP
+					<button
+						type="button"
+						disabled={loading.airdrop}
+						onClick={airdropHandler}
+					>
+						{loading.airdrop
+							? "Sending you 100 mUSDT..."
+							: "Get 100 mUSDT"}
 					</button>
 				</div>
+
+				{renderIssueRewardsButton()}
 			</form>
 		</div>
 	);

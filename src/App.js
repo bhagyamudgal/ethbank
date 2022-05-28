@@ -8,6 +8,10 @@ import Header from "./components/Header";
 import Hero from "./components/Hero";
 import DisplayBalance from "./components/DisplayBalance";
 import BlockAppAccess from "./components/BlockAppAccess";
+import StakingForm from "./components/StakingForm";
+import DisplayError from "./components/DisplayError";
+import DisplaySuccess from "./components/DisplaySuccess";
+import Footer from "./components/Footer";
 
 // css
 import "./App.css";
@@ -16,15 +20,13 @@ import "./App.css";
 import Tether from "./build/contracts/Tether.json";
 import ERT from "./build/contracts/ERT.json";
 import Ethbank from "./build/contracts/Ethbank.json";
-import StakingForm from "./components/StakingForm";
-import DisplayError from "./components/DisplayError";
 
 function App() {
 	NProgress.configure({ showSpinner: false });
 
 	const [accountAddress, setAccountAddress] = useState("0x0");
 
-	const [reloadData, setReloadData] = useState(false);
+	const [reloadData, setReloadData] = useState(0);
 
 	const [blockAppAccess, setBlockAppAccess] = useState({
 		status: false,
@@ -32,6 +34,7 @@ function App() {
 	});
 
 	const [error, setError] = useState({ status: false, message: null });
+	const [success, setSuccess] = useState({ status: false, message: null });
 
 	const [contractData, setContractData] = useState({
 		tether: null,
@@ -162,13 +165,6 @@ function App() {
 	useEffect(() => {
 		loadWeb3();
 		loadBlockchainData();
-	}, []);
-
-	useEffect(() => {
-		if (reloadData) {
-			loadBlockchainData();
-			setReloadData(false);
-		}
 	}, [reloadData]);
 
 	useEffect(() => {
@@ -180,13 +176,22 @@ function App() {
 	}, [contractData.loading]);
 
 	useEffect(() => {
-		if (error.status) {
+		if (error.status && error.message) {
 			window.scrollTo(0, 0);
 			setTimeout(() => {
-				setError({ status: false, message: "" });
-			}, 10000);
+				setError({ status: false, message: null });
+			}, 5000);
 		}
 	}, [error.status]);
+
+	useEffect(() => {
+		if (success.status && success.message) {
+			window.scrollTo(0, 0);
+			setTimeout(() => {
+				setSuccess({ status: false, message: null });
+			}, 5000);
+		}
+	}, [success.status]);
 
 	return (
 		<main className="app">
@@ -195,19 +200,27 @@ function App() {
 			)}
 
 			{error.status && <DisplayError message={error.message} />}
+			{success.status && <DisplaySuccess message={success.message} />}
+
 			<Header accountAddress={accountAddress} />
+
 			<Hero />
+
 			<DisplayBalance
 				stakingBalance={contractData.ethbankBalance}
 				rewardsBalance={contractData.ertBalance}
 			/>
+
 			<StakingForm
 				accountBalance={contractData.tetherBalance}
 				contractData={contractData}
 				accountAddress={accountAddress}
 				setReloadData={setReloadData}
 				setError={setError}
+				setSuccess={setSuccess}
 			/>
+
+			<Footer />
 		</main>
 	);
 }

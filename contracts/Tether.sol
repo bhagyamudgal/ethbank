@@ -5,10 +5,12 @@ pragma solidity ^0.5.13;
 contract Tether {
     string public name = "Mock Tether Token";
     string public symbol = "mUSDT";
-    uint256 public totalSupply = 1000000000000000000 * 1000000;
+    uint256 public totalSupply = 1000000 * 10**18;
     uint8 public decimals = 18;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
+
+    event Airdrop(address indexed _to, string _value);
 
     event Approval(
         address indexed _owner,
@@ -20,7 +22,7 @@ contract Tether {
     mapping(address => mapping(address => uint256)) public allowance;
 
     constructor() public {
-        balanceOf[msg.sender] = totalSupply;
+        balanceOf[msg.sender] = 1000 * 10**18;
     }
 
     function transfer(address _to, uint256 _value)
@@ -31,6 +33,14 @@ contract Tether {
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
         emit Transfer(msg.sender, _to, _value);
+        return true;
+    }
+
+    function airdrop() public returns (bool success) {
+        require(totalSupply >= 100 * 10**18, "mUSDT supply is over!");
+        balanceOf[msg.sender] += 100 * 10**18;
+        totalSupply -= 100;
+        emit Airdrop(msg.sender, "100");
         return true;
     }
 

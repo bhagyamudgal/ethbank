@@ -9,6 +9,7 @@
 	"author": "Bhagya Mudgal",
 	"license": "ISC",
 	"dependencies": {
+		"@truffle/hdwallet-provider": "^2.0.8",
 		"@types/jest": "^26.0.24",
 		"@types/node": "^16.11.35",
 		"@types/react": "^17.0.45",
@@ -22,6 +23,7 @@
 		"chai": "4.2.0",
 		"chai-as-promised": "7.1.1",
 		"chai-bignumber": "3.0.0",
+		"dotenv": "^16.0.1",
 		"identicon.js": "^2.3.3",
 		"nprogress": "^0.2.0",
 		"react": "^16.14.0",

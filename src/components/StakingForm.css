@@ -58,3 +58,14 @@
 		width: 100%;
 	}
 }
+
+.stakingForm-airdrop-section {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.stakingForm-airdrop-section p {
+	margin: 0.5rem 0;
+}
