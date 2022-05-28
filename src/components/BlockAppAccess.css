@@ -15,5 +15,6 @@
 }
 
 .blockAppAccess h1 {
+	z-index: 150;
 	font-size: 2rem;
 }
