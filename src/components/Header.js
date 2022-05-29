@@ -2,8 +2,12 @@ import React from "react";
 import "./Header.css";
 
 function Header({ accountAddress }) {
-	const shortenedAccountAddress =
-		accountAddress.slice(0, 5) + "..." + accountAddress.slice(-4);
+	let shortenedAccountAddress = "0x0";
+
+	if (accountAddress) {
+		shortenedAccountAddress =
+			accountAddress.slice(0, 5) + "..." + accountAddress.slice(-4);
+	}
 
 	return (
 		<header className="header">

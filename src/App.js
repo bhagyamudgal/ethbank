@@ -29,8 +29,8 @@ function App() {
 	const [reloadData, setReloadData] = useState(0);
 
 	const [blockAppAccess, setBlockAppAccess] = useState({
-		status: false,
-		message: "",
+		status: true,
+		message: "Loading App...",
 	});
 
 	const [error, setError] = useState({ status: false, message: null });
@@ -43,37 +43,49 @@ function App() {
 		tetherBalance: "0",
 		ertBalance: "0",
 		ethbankBalance: "0",
-		loading: true,
+		loading: false,
 	});
 
+	const [isWalletConnected, setIsWalletConnected] = useState(false);
+
 	const loadWeb3 = async () => {
-		setContractData((prevState) => {
-			return { ...prevState, loading: true };
-		});
-
-		if (window.ethereum) {
-			window.web3 = new Web3(window.ethereum);
-			await window.ethereum.enable();
-		} else if (window.web3) {
-			window.web3 = new Web3(window.web3.currentProvider);
-		} else {
-			setContractData((prevState) => {
-				return { ...prevState, loading: false };
-			});
-
+		try {
+			if (window.ethereum) {
+				window.web3 = new Web3(window.ethereum);
+				await window.ethereum.enable();
+				window.web3.eth.getAccounts().then((accounts) => {
+					if (accounts[0]) {
+						setIsWalletConnected(true);
+					}
+				});
+			} else if (window.web3) {
+				window.web3 = new Web3(window.web3.currentProvider);
+				window.web3.eth.getAccounts().then((accounts) => {
+					if (accounts[0]) {
+						setIsWalletConnected(true);
+					}
+				});
+			}
+		} catch (error) {
 			setBlockAppAccess({
 				status: true,
 				message:
 					"No Ethereum wallet detected! You can checkout MetaMask and reload app.",
 			});
+			setIsWalletConnected(false);
 		}
 	};
 
 	const loadBlockchainData = async () => {
 		try {
+			setContractData((prevState) => {
+				return { ...prevState, loading: true };
+			});
+
 			const web3 = window.web3;
 
 			const account = await web3.eth.getAccounts();
+
 			setAccountAddress(account[0]);
 
 			// getting network id
@@ -101,7 +113,7 @@ function App() {
 				setBlockAppAccess({
 					status: true,
 					message:
-						"Wrong network detected! Please switch your network and reload app.",
+						"Wrong network detected! Please switch to Rinkeby network and reload app.",
 				});
 			}
 
@@ -124,7 +136,7 @@ function App() {
 				setBlockAppAccess({
 					status: true,
 					message:
-						"Wrong network detected! Please switch your network and reload app.",
+						"Wrong network detected! Please switch to Rinkeby network and reload app.",
 				});
 			}
 
@@ -150,7 +162,7 @@ function App() {
 				setBlockAppAccess({
 					status: true,
 					message:
-						"Wrong network detected! Please switch your network and reload app.",
+						"Wrong network detected! Please switch to Rinkeby network and reload app.",
 				});
 			}
 
@@ -167,9 +179,18 @@ function App() {
 	};
 
 	useEffect(() => {
-		loadWeb3();
-		loadBlockchainData();
-	}, [reloadData]);
+		if (!isWalletConnected) {
+			loadWeb3();
+		}
+
+		if (isWalletConnected) {
+			setBlockAppAccess({
+				status: false,
+				message: null,
+			});
+			loadBlockchainData();
+		}
+	}, [reloadData, isWalletConnected]);
 
 	useEffect(() => {
 		if (contractData.loading) {
