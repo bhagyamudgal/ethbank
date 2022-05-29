@@ -65,6 +65,13 @@ function App() {
 						setIsWalletConnected(true);
 					}
 				});
+			} else {
+				setBlockAppAccess({
+					status: true,
+					message:
+						"No Ethereum wallet detected! You can checkout MetaMask and reload app.",
+				});
+				setIsWalletConnected(false);
 			}
 		} catch (error) {
 			setBlockAppAccess({
