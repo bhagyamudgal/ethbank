@@ -5,7 +5,7 @@ A minimal decentralized banking application (dApp) deployed on the Rinkeby test 
 
 **Link to App -** https://ethbank.netlify.app/
 
-**My Portfolio Website -** https://www.bhagyamudgal.me/
+**My Portfolio Website -** https://www.bhagyamudgal.com/
 
 
 
