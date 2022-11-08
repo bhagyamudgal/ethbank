@@ -6,7 +6,7 @@ function Footer() {
 		<footer className="footer">
 			Developed by&nbsp;
 			<a
-				href="https://www.bhagyamudgal.me"
+				href="https://www.bhagyamudgal.com"
 				target="_blank"
 				rel="noopener noreferrer"
 				className="link"
